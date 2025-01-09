@@ -1,38 +1,40 @@
-const nodemailer = require('nodemailer');
-const MailModel = require('../models/mail.model');
-const path = require('path');
-const smts_logo = path.join(__dirname, '../assets/SMTS_icon.png')
+// Summary:
+// The sendMail controller function handles the core logic for sending emails.
+// It sets up a Nodemailer transporter, formats the email with a logo and HTML content, and sends the email to the provided contact and the admin.
+// It responds with a success or error message depending on whether the email was sent successfully.
 
+const nodemailer = require('nodemailer'); // Import Nodemailer for sending emails
+const MailModel = require('../models/mail.model'); // Import the MailModel for structured data
+const path = require('path'); // Path module for resolving file paths
+const smts_logo = path.join(__dirname, '../assets/SMTS_icon.png'); // Path to the SMTS logo
 
+// Function to send mail
 const sendMail = async (req, res) => {
-    const { subject, message, contact, userName } = req.body;
+    const { subject, message, contact, userName } = req.body; // Extract data from request body
 
-    const mailData = new MailModel({ subject, message, contact, userName });
+    const mailData = new MailModel({ subject, message, contact, userName }); // Create a new MailModel instance with the request data
 
     try {
+        // Set up Nodemailer transporter
         const transporter = nodemailer.createTransport({
-            host: 'sv92.ifastnet.com',
-            port: 465,
-            secure: true,
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
+            secure: true, // Use secure SMTP
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: process.env.EMAIL_USER, // Email user from .env
+                pass: process.env.EMAIL_PASS, // Email password from .env
             },
-            logger: true,
-            debug: true
+            logger: true, // Enable logging for debugging
+            debug: process.env.NODE_ENV === 'development' ? true : false // Enable debug for troubleshooting
         });
 
-        // // MAIL PACKAGE BUNDLE
+        // Define the mail options (content and attachments)
         const mailOptions = {
-            // SENDS EMAIL - MUST MATCH AUTH EMAIL
-            from: process.env.EMAIL_USER,
-            // SENDS EMAIL TO OUR ACCOUNT
-            to: process.env.EMAIL_USER,
-            // OPTIONAL SEND COPY TO CLIENT
-            bcc: mailData.contact,
-            // EMAIL CONTENT
-            subject: `Seniors Mobile Tax Services Message Confirmation - Email from ${mailData.userName} | ${mailData.subject}`,
-            html: 
+            from: process.env.EMAIL_USER, // Sender's email (must match the auth email)
+            to: process.env.EMAIL_USER, // Recipient (also the sender for this case)
+            bcc: mailData.contact, // Optionally send a copy to the client (contact email)
+            subject: `Seniors Mobile Tax Services Message Confirmation - Email from ${mailData.userName} | ${mailData.subject}`, // Email subject
+            html: // Email HTML content (email body structure)
                 `
                 <body style="background-color: black; margin: 0; padding: 0;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: black; border-collapse: collapse; max-width: 1000px; margin: auto;">
@@ -110,21 +112,21 @@ const sendMail = async (req, res) => {
                 `,
             attachments: [
                 {
-                    filename: 'logo_light.png',
-                    path: smts_logo,
-                    cid: 'smts_logo'
+                    filename: 'logo_light.png', // Attachment file name
+                    path: smts_logo, // Path to the attachment
+                    cid: 'smts_logo' // Content-ID for embedding the logo image in the email
                 }
             ]
         };
 
-
-        await transporter.sendMail(mailOptions);
-        console.log("200 - Email Sent Successfully");
-        return res.status(200).json({ message: "Email Sent Successfully" });
-    } catch (error) {
-        console.error("500 - Failed to Send Email", error);
-        return res.status(500).json({ message: "Failed to Send Email" });
-    }
+ // Send the email using Nodemailer
+ await transporter.sendMail(mailOptions);
+ console.log("200 - Email Sent Successfully"); // Log success
+ return res.status(200).json({ message: "Email Sent Successfully" }); // Respond with success
+} catch (error) {
+ console.error("500 - Failed to Send Email", error); // Log any errors
+ return res.status(500).json({ message: `Failed to send email: ${ error.message }` }); // Respond with failure
+}
 };
 
-module.exports = { sendMail };
+module.exports = { sendMail }; // Export the sendMail function for use in routes
