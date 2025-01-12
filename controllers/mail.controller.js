@@ -6,7 +6,7 @@
 const nodemailer = require('nodemailer'); // Import Nodemailer for sending emails
 const MailModel = require('../models/mail.model'); // Import the MailModel for structured data
 const path = require('path'); // Path module for resolving file paths
-const smts_logo = path.join(__dirname, '../assets/SMTS_icon.png'); // Path to the SMTS logo
+const smts_logo = path.join(__dirname, '../assets/SMTS_Icon.png'); // Path to the SMTS logo
 
 // Function to send mail
 const sendMail = async (req, res) => {
@@ -25,7 +25,9 @@ const sendMail = async (req, res) => {
                 pass: process.env.EMAIL_PASS, // Email password from .env
             },
             logger: true, // Enable logging for debugging
-            debug: process.env.NODE_ENV === 'development' ? true : false // Enable debug for troubleshooting
+            debug: process.env.NODE_ENV === 'development' // Enable debug for troubleshooting
+                ? true 
+                : false 
         });
 
         // Define the mail options (content and attachments)

@@ -1,3 +1,5 @@
+- [ENV](https://docs.google.com/document/d/1xMHYasqKFm0Z1_wKz5Nqk1MvxTOAMUtcoZC1kmMuC74/edit?tab=t.0)
+
 # smts-backend
 
 ## This backend is for support of the nodemailer system for use with the 'on page' contact form on the SMTS frontend app.

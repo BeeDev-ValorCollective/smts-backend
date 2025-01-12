@@ -19,7 +19,9 @@ app.use(
   express.urlencoded({ extended: true }), // Parse URL-encoded data (extended allows richer objects)
   cors({ 
     credentials: true, // Enable credentials (cookies, authorization headers)
-    origin: `http://localhost:${process.env.FRONTEND_PORT}` // Specify the allowed frontend origin
+    origin: process.env.NODE_ENV === 'development'
+      ? process.env.FRONTEND_DEV_ORIGIN // Use development origin from .env
+      : process.env.FRONTEND_ORIGIN // Use production origin from .env
   })
 );
 
