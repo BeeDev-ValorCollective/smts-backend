@@ -9,10 +9,13 @@ const path = require('path'); // Path module for resolving file paths
 const smts_logo = path.join(__dirname, '../assets/SMTS_Icon.png'); // Path to the SMTS logo
 
 // Function to send mail
-const sendMail = async (req, res) => {
+const sendContactMail = async (req, res) => {
     const { subject, message, contact, userName } = req.body; // Extract data from request body
 
     const mailData = new MailModel({ subject, message, contact, userName }); // Create a new MailModel instance with the request data
+
+    console.log('CONTACT_EMAIL_USER:', process.env.CONTACT_EMAIL);
+    console.log('CONTACT_EMAIL_PASS:', process.env.CONTACT_EMAIL ? '********' : 'MISSING');
 
     try {
         // Set up Nodemailer transporter
@@ -21,8 +24,8 @@ const sendMail = async (req, res) => {
             port: process.env.EMAIL_PORT,
             secure: true, // Use secure SMTP
             auth: {
-                user: process.env.EMAIL_USER, // Email user from .env
-                pass: process.env.EMAIL_PASS, // Email password from .env
+                user: process.env.CONTACT_EMAIL_USER, // Email user from .env
+                pass: process.env.CONTACT_EMAIL_PASS, // Email password from .env
             },
             logger: true, // Enable logging for debugging
             debug: process.env.NODE_ENV === 'development' // Enable debug for troubleshooting
@@ -32,8 +35,8 @@ const sendMail = async (req, res) => {
 
         // Define the mail options (content and attachments)
         const mailOptions = {
-            from: process.env.EMAIL_USER, // Sender's email (must match the auth email)
-            to: process.env.EMAIL_USER, // Recipient (also the sender for this case)
+            from: process.env.CONTACT_EMAIL_USER, // Sender's email (must match the auth email)
+            to: process.env.CONTACT_EMAIL_USER, // Recipient (also the sender for this case)
             bcc: mailData.contact, // Optionally send a copy to the client (contact email)
             subject: `Seniors Mobile Tax Services Message Confirmation - Email from ${ mailData.userName } | ${ mailData.subject }`, // Email subject
             html: // Email HTML content (email body structure)
@@ -130,4 +133,4 @@ const sendMail = async (req, res) => {
 }
 };
 
-module.exports = { sendMail }; // Export the sendMail function for use in routes
+module.exports = { sendContactMail }; // Export the sendMail function for use in routes
