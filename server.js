@@ -31,5 +31,8 @@ app.use('/api', mailRoutes); // Prefix mail routes with '/api'
 
 // START THE SERVER AND LISTEN ON SPECIFIED PORT
 app.listen(process.env.PORT, () => {
-  console.log(`Seniors Mobile Tax Services Going To Port: ${process.env.PORT}`); // Log when the server starts
+  console.log(`Seniors Mobile Tax Services Going To Port: ${process.env.PORT}`);
+  console.log(`NodeENV = ${process.env.NODE_ENV}`) 
+  console.log(`ContactEmail= ${process.env.CONTACT_EMAIL_USER}| NoreplyEmail= ${process.env.NOREPLY_EMAIL_USER}`)
+  // Log when the server starts
 });
