@@ -9,13 +9,13 @@ const path = require('path'); // Path module for resolving file paths
 const smts_logo = path.join(__dirname, '../assets/SMTS_Icon.png'); // Path to the SMTS logo
 
 // Function to send mail
-const sendContactMail = async (req, res) => {
+const sendUnsubMail = async (req, res) => {
     const { subject, message, contact, userName } = req.body; // Extract data from request body
 
     const mailData = new MailModel({ subject, message, contact, userName }); // Create a new MailModel instance with the request data
 
-    console.log('CONTACT_EMAIL_USER:', process.env.CONTACT_EMAIL);
-    console.log('CONTACT_EMAIL_PASS:', process.env.CONTACT_EMAIL ? '********' : 'MISSING');
+    console.log('NOREPLY_EMAIL_USER:', process.env.NOREPLY_EMAIL);
+    console.log('NOREPLY_EMAIL_PASS:', process.env.NOTREPLY_EMAIL ? '********' : 'MISSING');
 
     try {
         // Set up Nodemailer transporter
@@ -24,8 +24,8 @@ const sendContactMail = async (req, res) => {
             port: process.env.EMAIL_PORT,
             secure: true, // Use secure SMTP
             auth: {
-                user: process.env.CONTACT_EMAIL_USER, // Email user from .env
-                pass: process.env.CONTACT_EMAIL_PASS, // Email password from .env
+                user: process.env.NOREPLY_EMAIL_USER, // Email user from .env
+                pass: process.env.NOREPLY_EMAIL_PASS, // Email password from .env
             },
             logger: true, // Enable logging for debugging
             debug: process.env.NODE_ENV === 'development' // Enable debug for troubleshooting
@@ -35,10 +35,10 @@ const sendContactMail = async (req, res) => {
 
         // Define the mail options (content and attachments)
         const mailOptions = {
-            from: process.env.CONTACT_EMAIL_USER, // Sender's email (must match the auth email)
-            to: process.env.CONTACT_EMAIL_USER, // Recipient (also the sender for this case)
+            from: process.env.NOREPLY_EMAIL_USER, // Sender's email (must match the auth email)
+            to: process.env.NOREPLY_EMAIL_USER, // Recipient (also the sender for this case)
             bcc: mailData.contact, // Optionally send a copy to the client (contact email)
-            subject: `Seniors Mobile Tax Services Message Confirmation - Email from ${ mailData.userName } | ${ mailData.subject }`, // Email subject
+            subject: 'Unsubscribed Confirmation', // Email subject
             html: // Email HTML content (email body structure)
                 `
                 <body style="background-color: black; margin: 0; padding: 0;">
@@ -64,7 +64,7 @@ const sendContactMail = async (req, res) => {
                                     <tr>
                                         <td style="padding: 16px;">
                                             <div style="text-align: center;">
-                                                <p style="font-size: 0.9rem; margin: 16px auto; width:80%; color: #3C3B6E; min-width: 280px;">Email confirmation from: <br> Seniors Mobile Tax Services <br> We will respond within 1-2 business days</p>
+                                                <p style="font-size: 0.9rem; margin: 16px auto; width:80%; color: #3C3B6E; min-width: 280px;">Unsubscribe confirmation from: <br> Seniors Mobile Tax Services <br> This is an unmonitored mail box please do not reply</p>
                                                 <h5 style="font-size: 1.3rem; margin: 8px 0 0 0; color: #3C3B6E;">Message received from:</h5>
                                                 <p style="font-size: 1.1rem; margin: 0 0 16px 0; color: #3C3B6E;">${ mailData.userName }</p>
                                             </div>
@@ -106,7 +106,6 @@ const sendContactMail = async (req, res) => {
                                             <hr style="width: 95%; margin: 8px auto 24px; border: 2px solid #AA2B34;">
                                             <h5 style="margin: 0; padding: 0 8px; color: #3C3B6E;">Disclaimer:</h5>
                                             <p style="font-size: .8rem ;margin: 8px auto; padding: 0 8px; width:95%; color: #3C3B6E;">This email was intended for ${ mailData.userName } (${ mailData.contact }). If you are not the intended recipient of this email, please notify the sender immediately by replying to this message and delete this email from your inbox. Any unauthorized use, disclosure, or distribution of this email is prohibited. Thank you for your understanding.</p>
-                                            <p style="font-size: .8rem ;margin: 8px auto; padding: 0 8px; width:95%; color: #3C3B6E;">If you wish to unsubscribe from future emails please visit <a href=${ process.env.SMTS_Link }/unsubscribe>${ process.env.SMTS_Link }/unsubscribe</a> to have your information removed.</p>
                                         </td>
                                     </tr>
                                 </table>
@@ -134,4 +133,4 @@ const sendContactMail = async (req, res) => {
 }
 };
 
-module.exports = { sendContactMail }; // Export the sendMail function for use in routes
+module.exports = { sendUnsubMail }; // Export the sendMail function for use in routes
